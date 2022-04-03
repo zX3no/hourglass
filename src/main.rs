@@ -64,30 +64,43 @@ impl Sandbox for Timer {
     }
 
     fn view(&mut self) -> Element<Message> {
-        // let row: Row<Message> = Row::new()
-        //     .padding(10)
-        //     .align_items(Align::Center)
-        //     .push(Button::new(&mut self.start, Text::new("Start")).on_press(Message::Start))
-        //     .push(Button::new(&mut self.stop, Text::new("Stop")).on_press(Message::Stop))
-        //     .push(Button::new(&mut self.restart, Text::new("Restart")).on_press(Message::Restart));
+        let row: Row<Message> = Row::new()
+            .padding(10)
+            .align_items(Align::Center)
+            .push(
+                Button::new(&mut self.start, Text::new("Start"))
+                    .on_press(Message::Start)
+                    .style(style::Button::Primary),
+            )
+            .push(
+                Button::new(&mut self.stop, Text::new("Stop"))
+                    .on_press(Message::Stop)
+                    .style(style::Button::Primary),
+            )
+            .push(
+                Button::new(&mut self.restart, Text::new("Restart"))
+                    .on_press(Message::Restart)
+                    .style(style::Button::Primary),
+            );
 
-        // let column = Column::new()
-        //     .align_items(Align::Center)
-        //     .padding(10)
-        //     .push(TextInput::new(
-        //         &mut self.text_input,
-        //         "Enter time:",
-        //         &self.text,
-        //         Message::InputChanged,
-        //     ))
-        //     .push(row);
-
-        let canvas = Canvas::new(self).width(Length::Fill).height(Length::Fill);
-
-        Container::new(canvas)
-            .width(Length::Fill)
-            .height(Length::Fill)
+        Column::new()
+            .align_items(Align::Center)
+            .padding(10)
+            .push(TextInput::new(
+                &mut self.text_input,
+                "Enter time:",
+                &self.text,
+                Message::InputChanged,
+            ))
+            .push(row)
             .into()
+
+        // let canvas = Canvas::new(self).width(Length::Fill).height(Length::Fill);
+
+        // Container::new(canvas)
+        //     .width(Length::Fill)
+        //     .height(Length::Fill)
+        //     .into()
     }
 }
 
@@ -107,5 +120,29 @@ impl<Message> canvas::Program<Message> for Timer {
         });
 
         vec![clock]
+    }
+}
+
+mod style {
+    use iced::{button, Background, Color, Vector};
+
+    pub enum Button {
+        Primary,
+        Hover,
+    }
+
+    impl button::StyleSheet for Button {
+        fn active(&self) -> button::Style {
+            button::Style {
+                background: Some(Background::Color(match self {
+                    Button::Primary => Color::from_rgb(0.11, 0.42, 0.87),
+                    Button::Hover => Color::from_rgb(0.8, 0.2, 0.2),
+                })),
+                border_radius: 6.0,
+                shadow_offset: Vector::new(1.0, 1.0),
+                text_color: Color::WHITE,
+                ..button::Style::default()
+            }
+        }
     }
 }
