@@ -1,9 +1,12 @@
+#![allow(unused)]
 use iced::{
     button,
     canvas::{self, Cache, Cursor, Geometry, Path, Program},
-    text_input, window, Align, Button, Canvas, Color, Column, Container, Element, Length, Point,
-    Rectangle, Row, Sandbox, Settings, Size, Text, TextInput,
+    text_input, window, Alignment, Button, Canvas, Color, Column, Container, Element, Length,
+    Point, Rectangle, Row, Sandbox, Settings, Size, Text, TextInput,
 };
+
+mod style;
 
 pub fn main() -> iced::Result {
     Timer::run(Settings {
@@ -28,7 +31,7 @@ struct Timer {
 }
 
 #[derive(Debug, Clone)]
-enum Message {
+pub enum Message {
     Start,
     Stop,
     Restart,
@@ -95,7 +98,9 @@ impl Sandbox for Timer {
         //     .push(row)
         //     .into()
 
-        let canvas = Canvas::new(self).width(Length::Fill).height(Length::Fill);
+        let canvas = Canvas::new(Test::default())
+            .width(Length::Fill)
+            .height(Length::Fill);
 
         Container::new(canvas)
             .width(Length::Fill)
@@ -104,42 +109,30 @@ impl Sandbox for Timer {
     }
 }
 
-impl Program<Message> for Timer {
+#[derive(Debug, Default)]
+struct Test {
+    cache: Cache,
+}
+
+impl Program<Message> for Test {
     fn draw(&self, bounds: Rectangle, _cursor: Cursor) -> Vec<Geometry> {
         let time = self.cache.draw(bounds.size(), |frame| {
+            //draw inactive timer
             let top_left = Point::new(0.0, 0.0);
             let size = Size::new(frame.width(), frame.height());
+            frame.fill_rectangle(top_left, size, Color::from_rgb8(45, 45, 48));
+
+            //draw active timer
+            let top_left = Point::new(0.0, 0.0);
+            let size = Size::new(frame.width() - 200.0, frame.height());
             frame.fill_rectangle(top_left, size, Color::from_rgb8(54, 101, 179));
 
+            //draw the middle
             let top_left = Point::new(15.0, 15.0);
             let size = Size::new(frame.width() - 30.0, frame.height() - 30.0);
             frame.fill_rectangle(top_left, size, Color::from_rgb8(30, 30, 30));
         });
 
         vec![time]
-    }
-}
-
-mod style {
-    use iced::{button, Background, Color, Vector};
-
-    pub enum Button {
-        Primary,
-        Hover,
-    }
-
-    impl button::StyleSheet for Button {
-        fn active(&self) -> button::Style {
-            button::Style {
-                background: Some(Background::Color(match self {
-                    Button::Primary => Color::from_rgb(0.11, 0.42, 0.87),
-                    Button::Hover => Color::from_rgb(0.8, 0.2, 0.2),
-                })),
-                border_radius: 6.0,
-                shadow_offset: Vector::new(1.0, 1.0),
-                text_color: Color::WHITE,
-                ..button::Style::default()
-            }
-        }
     }
 }
